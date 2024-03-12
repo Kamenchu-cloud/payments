@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 def solution(A, D):
     # Acc bal in 2020 == 0
     # If amount === <0 then payment was made by card else it was an incoming transfer.
@@ -10,17 +12,27 @@ def solution(A, D):
     # Use a for loop
 
     balance = 0
-    card_payments = (int)
-
-    for amount, date in (A,D):
-        year, month, _ = date.split('-')
+    card_payments = defaultdict(int)
+    
+    for amount, date in zip(A, D):
+        year, month, _ = map(int, date.split("-"))
+        
+        # Update card payments for the month
         if amount < 0:
-            balance += amount
-            card_payments[month] += 1
+            card_payments[(year, month)] += abs(amount)
+        
+        # Update balance based on incoming transfer
         else:
             balance += amount
-
-        if month in card_payments and card_payments[month] <3 and sum(card_payments.values()) < 100:
-            balance -= 5
-
+        
+        # Apply fee at the end of the month if needed
+        if month < 12:
+            card_payment_total = sum(card_payments[(year, m)] for m in range(month, month + 3))
+            if card_payment_total < 100:
+                balance -= 5
+    
     return balance
+
+
+result = solution([100, 100, 100, -10], ["2020-12-31", "2020-12-22", "2020-12-03", "2020-12-29"])
+print(result)
